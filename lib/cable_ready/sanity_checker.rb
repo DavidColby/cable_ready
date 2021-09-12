@@ -10,6 +10,7 @@ class CableReady::SanityChecker
       return if ENV["SKIP_SANITY_CHECK"]
       return if CableReady.config.on_failed_sanity_checks == :ignore
       return if called_by_generate_config?
+      return if called_by_stimulus_reflex_installer?
       return if called_by_rake?
 
       instance = new
@@ -21,6 +22,12 @@ class CableReady::SanityChecker
 
     def called_by_generate_config?
       ARGV.include?("cable_ready:initializer")
+    end
+
+    def called_by_stimulus_reflex_installer?
+      Rake.application.top_level_tasks.include? "stimulus_reflex:install"
+    rescue
+      false
     end
 
     def called_by_rake?
